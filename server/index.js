@@ -7,18 +7,22 @@ dotenv.config();
 const app = express();
 
 const PORT = 5000;
-const riot_api_key = "RGAPI-ef2d50aa-12ba-492d-b912-216fd0e761bc";
+const riot_api_key = "RGAPI-5068eac1-79d7-4ce0-bc90-d43557b7b40a";
 
-const gameName = "Makku";
-const tagLine = "NA1";
+app.use(cors({
+  origin:"http://localhost:3000"
+}));
 
-app.use(cors());
+app.use(express.json());
 
 app.get("/", async (req, res) => {
   res.json("My League of Legends API express server running on PORT " + PORT);
 });
 
 app.get("/profile", async (req, res) => {
+  const gameName = req.query.gameName;
+  const tagLine = req.query.tagLine;
+
   const URL = "https://americas.api.riotgames.com";
   const puuid_from_summoner_name_and_tagline_url = `${URL}/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}`;
   let puuid;
@@ -31,9 +35,9 @@ app.get("/profile", async (req, res) => {
       },
     });
     const data = await response.json();
-    puuid = data["puuid"];
+    puuid = data.puuid;
     if (!puuid) {
-      return res.status(404).json({ error: "puuid not found" });    
+      return res.status(404).json({ error: `puuid not found gameName: ${gameName} tagLine: ${tagLine}` });    
     }
   } catch (error) {
     return res.status(500).json({ error: "Failed to fetch puuid" });
@@ -57,7 +61,7 @@ app.get("/profile", async (req, res) => {
   }
 
   // Fetch match data
-  let match = match_ids[19];
+  let match = match_ids[0];
   const match_data_url = `${URL}/lol/match/v5/matches/${match}`;
   let metadata, info, match_data;
   try {
@@ -67,8 +71,8 @@ app.get("/profile", async (req, res) => {
       },
     });
     match_data = await response.json();
-    metadata = match_data["metadata"];
-    info = match_data["info"];
+    metadata = match_data.metadata;
+    info = match_data.info;
     if (!metadata || !metadata["participants"]) {
       return res.status(404).json({ error: "No match metadata found" });
     }
@@ -89,8 +93,8 @@ app.get("/profile", async (req, res) => {
       });
       let data = await response.json();
       match_participants.push({
-        gamename: data["gameName"] || data["gamename"],
-        tagline: data["tagLine"] || data["tagline"],
+        gameName: data.gameName,
+        tagLine: data.tagLine
       });
     }
     return res.json(match_participants);
