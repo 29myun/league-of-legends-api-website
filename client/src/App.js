@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 function App() {
-  const [profileData, setProfileData] = useState(null);
+  const [profileData, setProfileData] = useState(null);   
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
