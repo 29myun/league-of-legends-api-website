@@ -1,0 +1,65 @@
+league api match details to implement:
+- game mode:
+
+- how long its been since the match
+- win or loss !$!
+- match duration !$!
+- champion played !$!
+- summoner abilities, items, runes !$!
+- kda !$!
+- participants !$!
+- icons for each champ played
+
+Gamemode Type IDs
+--------------------------------------
+420: ranked solo/duo
+440: ranked flex
+430: normal blind
+440: normal draft
+440: ARAM
+490: quickplay/swiftplay
+
+Summoner Spell IDs
+--------------------------------------
+1: Cleanse
+3: Exhaust
+4: Flash
+6: Ghost
+7: Heal
+11: Smite
+12: Teleport
+13: Clarity
+14: Ignite
+21: Barrier
+31: Porosnax
+32: Mark
+39: Snowball
+54: To the King
+
+Rune (perk) IDs:
+--------------------------------------
+8100: domination
+8112: electrocute
+8128: darkharvest
+9923: hailofblades
+	
+8300: inspiration
+8351: glacialaugment
+8360: unsealedspellbook
+8369: firststrike
+	
+8000: precision
+8005: presstheattack
+8008: lethaltempo
+8021: fleetfootwork
+8010: conqueror
+
+8400: resolve
+8437: graspoftheundying
+8439: aftershock
+8465: guardian
+
+8200: sorcery
+8214: summonaery
+8229: arcanecomet
+8230: phaserush
