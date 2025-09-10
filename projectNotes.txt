@@ -61,5 +61,9 @@ Rune (perk) IDs:
 
 8200: sorcery
 8214: summonaery
+<<<<<<< HEAD
 8229: arcanecomet
+=======
+8229: arcanecoment
+>>>>>>> 473b3731b00b0a12a685d5ea6f14c080065e6d51
 8230: phaserush
