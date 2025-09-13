@@ -27,7 +27,7 @@ export const perkIds = {
   8021: "FleetFootwork",
   8010: "Conqueror",
   8437: "GraspOfTheUndying",
-  8439: "Aftershock",
+  8439: "VeteranAftershock",
   8465: "Guardian",
   8214: "SummonAery",
   8229: "ArcaneComet",

@@ -1,3 +1,10 @@
+body {
+    color: white;
+    background-color: rgb(7, 7, 32);
+}
+
+/* 191937 */
+
 .match-container {
     width: 700px;
     height: 100px;
@@ -59,4 +66,12 @@
     white-space: nowrap;
     font-size: 12px;
     padding-left: 5px;
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.champion-names:hover {
+    color: white;
+    text-decoration: underline;
+    cursor: pointer;
 }

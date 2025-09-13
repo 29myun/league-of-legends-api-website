@@ -1,26 +1,28 @@
 import React, { useState } from "react";
-import "./index.css";
-import { formatSeconds, getTimeAgo } from "./time";
-import { championIds, summonerSpellIds, perkIds, queueIds } from "./ids";
+import { formatSeconds, getTimeAgo } from "../utils/time";
+import { summonerSpellIds, perkIds, queueIds } from "../utils/ids";
+import "../styles/profile.css";
 
-const serverPort = 5069;
+const PROFILE_SERVER_PORT = 5050;
 
-function App() {
+export default function Profile() {
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
   const fetchProfileData = async (event) => {
     event.preventDefault();
+
     if (!searchTerm) return;
 
     setLoading(true);
+
     const gameName = searchTerm.split("#")[0];
     const tagLine = searchTerm.split("#")[1];
 
     try {
       const response = await fetch(
-        `http://localhost:${serverPort}/match-history?gameName=${encodeURIComponent(
+        `http://localhost:${PROFILE_SERVER_PORT}/match-history?gameName=${encodeURIComponent(
           gameName
         )}&tagLine=${encodeURIComponent(tagLine)}`
       );
@@ -36,7 +38,116 @@ function App() {
     }
   };
 
-  function MatchDetails({ profileData }) {
+  const handlePlayerClick = async (riotIdGameName, riotIdTagline) => {
+    setSearchTerm(riotIdGameName + "#" + riotIdTagline);
+
+    if (!searchTerm) return;
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(
+        `http://localhost:${PROFILE_SERVER_PORT}/match-history?gameName=${encodeURIComponent(
+          riotIdGameName
+        )}&tagLine=${encodeURIComponent(riotIdTagline)}`
+      );
+      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+
+      const data = await response.json();
+      setProfileData(data);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setProfileData("");
+      setLoading(false);
+    }
+  };
+
+  const ProfileDetails = ({ profileData }) => {
+    const rankedSoloDuo = profileData.rankedSoloDuo;
+
+    return (
+      <>
+        <div style={{ display: "flex", gap: "20px", margin: "20px", marginLeft: "1px"}}>
+          <div
+            style={{
+              width: "75px",
+              height: "75px",
+              backgroundImage: `url(https://ddragon.leagueoflegends.com/cdn/15.17.1/img/profileicon/6894.png)`,
+              backgroundSize: "cover",
+            }}
+          />
+          <h1>
+            Makku <span style={{ color: "rgba(240, 255, 255, 0.8)" }}>#NA1</span>
+          </h1>
+        </div>
+        <div
+          style={{
+            width: "700px",
+            height: "100px",
+            display: "flex",
+            alignItems: "center",
+            borderRadius: "4px",
+            marginBottom: "5px",
+            color: "rgba(255, 255, 255, 0.9)",
+            fontWeight: "500",
+            fontSize: "14px",
+            backgroundColor: "rgb(25, 25, 55)",
+          }}
+        >
+          <div
+            style={{
+              width: "76.7px",
+              height: "56.7px",
+              backgroundImage: `url(/images/rank-emblems/${profileData.rankedSoloDuo.tier.toLowerCase()}.png)`,
+              backgroundSize: "cover",
+              marginLeft: "25px",
+            }}
+          />
+          <div
+            style={{
+              width: "170px",
+              marginRight: "285px",
+              marginLeft: "12px",
+            }}
+          >
+            <p
+              style={{
+                color: "white",
+                fontWeight: "550",
+                fontSize: "20px",
+                height: "4px",
+              }}
+            >
+              {rankedSoloDuo.tier.charAt(0) +
+                rankedSoloDuo.tier.substring(1).toLowerCase()}{" "}
+              {rankedSoloDuo.rank}
+            </p>
+            <p>{rankedSoloDuo.leaguePoints} LP</p>
+          </div>
+
+          <div
+            style={{
+              textAlign: "right",
+            }}
+          >
+            <p style={{ height: "4px" }}>
+              {rankedSoloDuo.wins}W {rankedSoloDuo.losses}L
+            </p>
+            <p>
+              {`${(
+                rankedSoloDuo.wins /
+                (rankedSoloDuo.wins + rankedSoloDuo.losses)
+              ).toFixed(2)}`.substring(2)}
+              % Win Rate
+            </p>
+          </div>
+        </div>
+      </>
+    );
+  };
+
+  const MatchDetails = ({ profileData }) => {
     let matches = [];
     for (let i = 0; i < profileData.matches.length; i++) {
       const match = profileData.matches[i];
@@ -51,16 +162,16 @@ function App() {
       let winOrLoss;
       let winOrLossColor;
       let matchBackgroundColor;
-      let iconBackgroundColor = "rgba(255, 255, 255, 0.1)";
+      let iconBackgroundColor = "rgba(255, 255, 255, 0.15)";
 
       if (currentProfileMatchData.win) {
         winOrLoss = "WIN";
-        winOrLossColor = "rgba(0, 0, 255, 1)";
-        matchBackgroundColor = "rgba(0, 0, 255, 0.6)";
+        winOrLossColor = "rgba(0, 100, 255, 1)";
+        matchBackgroundColor = "rgba(0, 125, 255, 0.3)";
       } else {
         winOrLoss = "LOSS";
         winOrLossColor = "rgba(255, 0, 0, 1)";
-        matchBackgroundColor = "rgba(225, 50, 50, 0.6";
+        matchBackgroundColor = "rgb(69, 25, 43)";
       }
 
       matches.push(
@@ -76,7 +187,7 @@ function App() {
             <div style={{ fontWeight: "bold", fontSize: "14px" }}>
               {queueIds[match.info.queueId]}
             </div>
-            <div style={{ fontSize: "12px " }}>
+            <div style={{ fontSize: "12px" }}>
               {getTimeAgo(match.info.gameCreation)}
             </div>
             <div
@@ -98,7 +209,7 @@ function App() {
             <div>
               <div
                 style={{
-                  backgroundImage: `url(https://ddragon.leagueoflegends.com/cdn/15.17.1/img/champion/${currentProfileMatchData.championName}.png`,
+                  backgroundImage: `url(https://ddragon.leagueoflegends.com/cdn/15.17.1/img/champion/${currentProfileMatchData.championName}.png)`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                   width: "52px",
@@ -248,7 +359,15 @@ function App() {
                     borderRadius: "2px",
                   }}
                 />
-                <p className="champion-names">
+                <p
+                  className="champion-names"
+                  onClick={() =>
+                    handlePlayerClick(
+                      participant.riotIdGameName,
+                      participant.riotIdTagline
+                    )
+                  }
+                >
                   {participant.riotIdGameName.length > 7
                     ? participant.riotIdGameName.substring(0, 7) + "..."
                     : participant.riotIdGameName}
@@ -271,21 +390,21 @@ function App() {
         {matches}
       </div>
     );
-  }
+  };
 
   return (
     <div
       style={{
         fontFamily: "Arial, sans-serif",
         padding: "2rem",
-        backgroundColor: "lightblue",
+        display: "flex",
+        alignItems: "center",
+        flexDirection: "column"
       }}
     >
-      <h1>League of Legends API Website</h1>
       <div
         style={{
-          display: "flex",
-          alignItems: "center",
+          display: "flex"
         }}
       >
         <form onSubmit={fetchProfileData}>
@@ -296,7 +415,14 @@ function App() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-bar"
             style={{
-              height: "17px",
+              height: "36px",
+              width: "340px",
+              border: "none",
+              outline: "none",
+              backgroundColor: "rgb(13, 13, 40)",
+              paddingLeft: "20px",
+              color: "rgba(255, 255, 255, 0.75)",
+              boxShadow: "8px 4px 8px rgba(0, 0, 0, 0.4)",
             }}
           />
         </form>
@@ -305,20 +431,30 @@ function App() {
           type="submit"
           onClick={fetchProfileData}
           className="search-button"
+          style={{
+            border: "none",
+            backgroundColor: "white",
+            height: "38px",
+            boxShadow: "8px 4px 8px rgba(0, 0, 0, 0.4)",
+            backgroundColor: "rgb(13, 13, 40)",
+          }}
         >
-          🔎
+          🔍
         </button>
       </div>
+      
+      <div>
+        {loading && <p>Loading...</p>}
 
-      <h2>Profile Data:</h2>
+        {!loading && profileData && (
+          <>
+            <ProfileDetails profileData={profileData} />
+            <MatchDetails profileData={profileData} />
+          </>
+        )}
 
-      {loading && <p>Loading...</p>}
-
-      {!loading && profileData && <MatchDetails profileData={profileData} />}
-
-      {!loading && !profileData && <p>No Data Found</p>}
+        {!loading && !profileData && <p>No Data Found</p>}
+      </div>
     </div>
   );
 }
-
-export default App;
