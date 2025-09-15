@@ -7,6 +7,8 @@ export default function Home() {
       <p>Navigate to different sections:</p>
       <ul>
         <button><Link to="/profile">Profile</Link></button>
+        <button><Link to="/champions">Champions</Link></button>
+        <button><Link to="/items">Items</Link></button>
       </ul>
     </div>
   )

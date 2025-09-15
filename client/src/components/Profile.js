@@ -22,7 +22,7 @@ export default function Profile() {
 
     try {
       const response = await fetch(
-        `http://localhost:${PROFILE_SERVER_PORT}/match-history?gameName=${encodeURIComponent(
+        `http://localhost:${PROFILE_SERVER_PORT}/api/profile?gameName=${encodeURIComponent(
           gameName
         )}&tagLine=${encodeURIComponent(tagLine)}`
       );
@@ -47,7 +47,7 @@ export default function Profile() {
 
     try {
       const response = await fetch(
-        `http://localhost:${PROFILE_SERVER_PORT}/match-history?gameName=${encodeURIComponent(
+        `http://localhost:${PROFILE_SERVER_PORT}/profile?gameName=${encodeURIComponent(
           riotIdGameName
         )}&tagLine=${encodeURIComponent(riotIdTagline)}`
       );
@@ -68,18 +68,35 @@ export default function Profile() {
 
     return (
       <>
-        <div style={{ display: "flex", gap: "20px", margin: "20px", marginLeft: "1px"}}>
-          <div
-            style={{
-              width: "75px",
-              height: "75px",
-              backgroundImage: `url(https://ddragon.leagueoflegends.com/cdn/15.17.1/img/profileicon/6894.png)`,
-              backgroundSize: "cover",
-            }}
-          />
-          <h1>
-            Makku <span style={{ color: "rgba(240, 255, 255, 0.8)" }}>#NA1</span>
-          </h1>
+        <div
+          style={{
+            display: "flex",
+            gap: "20px",
+            marginTop: "42px",
+            marginLeft: "1px",
+          }}
+        >
+          <div>
+            <div
+              style={{
+                width: "75px",
+                height: "75px",
+                backgroundImage: `url(https://ddragon.leagueoflegends.com/cdn/15.17.1/img/profileicon/${profileData.profileIconId}.png)`,
+                backgroundSize: "cover",
+                border: "2px solid black",
+                borderRadius: "5px",
+              }}
+            />
+          </div>
+          <div>
+            <h1 style={{ height: "14px" }}>
+              {profileData.gameName}{" "}
+              <span style={{ color: "rgba(240, 255, 255, 0.8)" }}>#{profileData.tagLine}</span>
+            </h1>
+            <h3>
+              lvl {profileData.summonerLevel}
+            </h3>
+          </div>
         </div>
         <div
           style={{
@@ -399,12 +416,12 @@ export default function Profile() {
         padding: "2rem",
         display: "flex",
         alignItems: "center",
-        flexDirection: "column"
+        flexDirection: "column",
       }}
     >
       <div
         style={{
-          display: "flex"
+          display: "flex",
         }}
       >
         <form onSubmit={fetchProfileData}>
@@ -442,18 +459,19 @@ export default function Profile() {
           🔍
         </button>
       </div>
-      
-      <div>
-        {loading && <p>Loading...</p>}
 
+      <div>
         {!loading && profileData && (
           <>
             <ProfileDetails profileData={profileData} />
             <MatchDetails profileData={profileData} />
           </>
         )}
-
-        {!loading && !profileData && <p>No Data Found</p>}
+        
+        <div style={{ marginTop: "40vh"}}>
+          {loading && <p>Loading...</p>}
+          {!loading && !profileData && <p>No Data Found</p>}
+        </div>
       </div>
     </div>
   );
