@@ -91,11 +91,11 @@ export default function Profile() {
           <div>
             <h1 style={{ height: "14px" }}>
               {profileData.gameName}{" "}
-              <span style={{ color: "rgba(240, 255, 255, 0.8)" }}>#{profileData.tagLine}</span>
+              <span style={{ color: "rgba(240, 255, 255, 0.8)", fontSize: "24px"}}>
+                #{profileData.tagLine}
+              </span>
             </h1>
-            <h3>
-              lvl {profileData.summonerLevel}
-            </h3>
+            <h3>lvl {profileData.summonerLevel}</h3>
           </div>
         </div>
         <div
@@ -112,43 +112,49 @@ export default function Profile() {
             backgroundColor: "rgb(25, 25, 55)",
           }}
         >
-          <div
-            style={{
-              width: "76.7px",
-              height: "56.7px",
-              backgroundImage: `url(/images/rank-emblems/${profileData.rankedSoloDuo.tier.toLowerCase()}.png)`,
-              backgroundSize: "cover",
-              marginLeft: "25px",
-            }}
-          />
-          <div
-            style={{
-              width: "170px",
-              marginRight: "285px",
-              marginLeft: "12px",
-            }}
-          >
-            <p
+          <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "20px", marginLeft: "24px"}}>
+            <div
               style={{
-                color: "white",
-                fontWeight: "550",
-                fontSize: "20px",
-                height: "4px",
+                width: "76.7px",
+                height: "56.7px",
+                backgroundImage: `url(/images/rank-emblems/${profileData.rankedSoloDuo.tier.toLowerCase()}.png)`,
+                backgroundSize: "cover",
+
+              }}
+            />
+            <div
+              style={{
+                width: "170px",
               }}
             >
-              {rankedSoloDuo.tier.charAt(0) +
-                rankedSoloDuo.tier.substring(1).toLowerCase()}{" "}
-              {rankedSoloDuo.rank}
-            </p>
-            <p>{rankedSoloDuo.leaguePoints} LP</p>
+              <p
+                style={{
+                  color: "white",
+                  fontWeight: "550",
+                  fontSize: "20px",
+                  height: "4px",
+                }}
+              >
+                {rankedSoloDuo.tier.charAt(0) +
+                  rankedSoloDuo.tier.substring(1).toLowerCase()}{" "}
+                {rankedSoloDuo.rank}
+              </p>
+              <p>{rankedSoloDuo.leaguePoints} LP</p>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", marginLeft: "65px", textAlign: "center", width: "100px" }}>
+            <span style={{ fontWeight: "bold", fontSize: "16px"}}>{profileData.avgKDA} KDA</span>
+            <span style={{ fontSize: "14px" }}>{profileData.avgKillsPerGame} <span style={{ color: "rgba(255, 255, 255, 0.4)" }}>/</span> {profileData.avgDeathsPerGame} <span style={{ color: "rgba(255, 255, 255, 0.4)" }}>/</span> {profileData.avgAssistsPerGame}</span>
           </div>
 
           <div
             style={{
               textAlign: "right",
+              marginLeft: "120px"
             }}
           >
-            <p style={{ height: "4px" }}>
+            <p style={{ height: "4px"}}>
               {rankedSoloDuo.wins}W {rankedSoloDuo.losses}L
             </p>
             <p>
@@ -409,70 +415,156 @@ export default function Profile() {
     );
   };
 
-  return (
-    <div
-      style={{
-        fontFamily: "Arial, sans-serif",
-        padding: "2rem",
-        display: "flex",
-        alignItems: "center",
-        flexDirection: "column",
-      }}
-    >
+  const ProfileChampionDetails = ({ profileData }) => {
+    const profileChampionData = profileData.profileChampionData;
+
+    let champions = []
+
+    Object.entries(profileChampionData).forEach(([championName, data]) => {
+      let kdaColor;
+      if (data.avgKDA < 1) {
+        kdaColor = "#ff4e50";
+      } else if (data.avgKDA >= 3) {
+        kdaColor = "#3273fa";
+      } else {
+        kdaColor = "white";
+      }
+      
+      let winrateColor;
+      if (data.winrate < 50) {
+        winrateColor = "#ff4e50";
+      } else if (data.winrate >= 50 && data.winrate < 75) {
+        winrateColor = "#3273fa";
+      } else if (data.winrate >= 75 && data.winrate <= 100) {
+        winrateColor = "#ff9b00";
+      } else {
+        winrateColor = "white";
+      }      
+
+      champions.push(
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-evenly",
+            backgroundColor: "rgb(25, 25, 55)",
+            borderRadius: "4px",
+            width: "375px",
+            height: "60px",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", width: "100px"}}>
+            <div
+              style={{
+                backgroundImage: `url(https://ddragon.leagueoflegends.com/cdn/15.17.1/img/champion/${championName}.png)`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                width: "40px",
+                height: "40px",
+              }}
+            />
+            <span style={{ fontSize: "12px" }}>{championName}</span>  
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", textAlign: "center", width: "100px"}}>
+              <span style={{ fontSize: "14px", fontWeight: "bold", color: kdaColor}}>{data.avgKDA} KDA</span>
+              <span style={{ fontSize: "12px" }}>{data.avgKillsPerGame} <span style={{ color: "rgba(255, 255, 255, 0.4)" }}>/</span> {data.avgDeathsPerGame} <span style={{ color: "rgba(255, 255, 255, 0.4)" }}>/</span> {data.avgAssistsPerGame}</span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", width: "60px", fontSize: "14px", textAlign: "right"}}>
+              <span style={{ color: winrateColor, fontWeight: "bold"}}>{data.winrate}%</span>
+              <span style={{ fontSize: "12px" }}>{data.nGames} games</span> 
+          </div>
+        </div>
+      )
+    })
+
+    return (
       <div
         style={{
           display: "flex",
+          flexDirection: "column",
+          gap: "5px",
         }}
       >
-        <form onSubmit={fetchProfileData}>
-          <input
-            type="text"
-            placeholder="SummonerName#TagLine"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-bar"
-            style={{
-              height: "36px",
-              width: "340px",
-              border: "none",
-              outline: "none",
-              backgroundColor: "rgb(13, 13, 40)",
-              paddingLeft: "20px",
-              color: "rgba(255, 255, 255, 0.75)",
-              boxShadow: "8px 4px 8px rgba(0, 0, 0, 0.4)",
-            }}
-          />
-        </form>
-
-        <button
-          type="submit"
-          onClick={fetchProfileData}
-          className="search-button"
-          style={{
-            border: "none",
-            backgroundColor: "white",
-            height: "38px",
-            boxShadow: "8px 4px 8px rgba(0, 0, 0, 0.4)",
-            backgroundColor: "rgb(13, 13, 40)",
-          }}
-        >
-          🔍
-        </button>
+        {champions}
       </div>
+    );
+  };
 
-      <div>
-        {!loading && profileData && (
-          <>
-            <ProfileDetails profileData={profileData} />
-            <MatchDetails profileData={profileData} />
-          </>
-        )}
-        
-        <div style={{ marginTop: "40vh"}}>
-          {loading && <p>Loading...</p>}
-          {!loading && !profileData && <p>No Data Found</p>}
+  return (
+    <>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          marginTop: "48px",
+          flexDirection: "column",
+        }}
+      >
+        <div style={{ display: "flex" }}>
+          <form onSubmit={fetchProfileData}>
+            <input
+              type="text"
+              placeholder="SummonerName#TagLine"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-bar"
+              style={{
+                height: "36px",
+                width: "400px",
+                border: "none",
+                outline: "none",
+                backgroundColor: "rgb(13, 13, 40)",
+                paddingLeft: "20px",
+                color: "rgba(255, 255, 255, 0.75)",
+                boxShadow: "8px 4px 8px rgba(0, 0, 0, 0.4)",
+              }}
+            />
+          </form>
+
+          <button
+            type="submit"
+            onClick={fetchProfileData}
+            className="search-button"
+            style={{
+              border: "none",
+              backgroundColor: "white",
+              height: "38px",
+              boxShadow: "8px 4px 8px rgba(0, 0, 0, 0.4)",
+              backgroundColor: "rgb(13, 13, 40)",
+            }}
+          >
+            🔍
+          </button>
+        </div>
+        <div>
+          {loading && <p style={{ marginTop: "36vh" }}>Loading...</p>}
+          {!loading && !profileData && <p style={{ marginTop: "36vh" }}>No Data Found</p>}
         </div>
       </div>
-    </div>
+      {!loading && profileData && (
+        <div
+          style={{
+            fontFamily: "Arial, sans-serif",
+            display: "flex",
+            justifyContent: "center",
+            gap: "16px",
+          }}
+        >
+          <div>
+            <ProfileDetails profileData={profileData} />
+            <MatchDetails profileData={profileData} />
+          </div>
+          <div
+            style={{
+              marginTop: "245px",
+            }}
+          >
+            <ProfileChampionDetails profileData={profileData} />
+          </div>
+        </div>
+      )}
+    </>
   );
 }

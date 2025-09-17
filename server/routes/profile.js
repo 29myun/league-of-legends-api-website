@@ -69,7 +69,7 @@ router.get("/", async (req, res) => {
       puuid: account.puuid,
       params: {
         start: 0,
-        count: 5,
+        count: 10,
         queue: 420,
       },
     });
@@ -89,6 +89,59 @@ router.get("/", async (req, res) => {
       data: profileData,
       timestamp: Date.now(),
     });
+
+    let profileChampionData = {};
+
+    for (let i = 0; i < profileData.matches.length; i++) {
+      const currentMatch = (profileData.matches[i].info.participants).find((participant) => participant.riotIdGameName === profileData.gameName)
+      const championName = currentMatch.championName
+
+      if (!(championName in profileChampionData))
+      profileChampionData[championName] = {
+        totalWins: 0,
+        totalLosses: 0,
+        totalKills: 0,
+        totalDeaths: 0,
+        totalAssists: 0,
+        nGames: 0,
+      };
+
+      if (currentMatch.win) {
+        profileChampionData[championName].totalWins += 1;
+      } else {
+        profileChampionData[championName].totalLosses += 1;
+      };
+
+      profileChampionData[championName].totalKills += currentMatch.kills;
+      profileChampionData[championName].totalDeaths += currentMatch.deaths;
+      profileChampionData[championName].totalAssists += currentMatch.assists;
+      profileChampionData[championName].nGames += 1;
+    }
+    
+    Object.entries(profileChampionData).forEach(([championName, data]) => {
+      data.avgKillsPerGame = (data.totalKills / data.nGames).toFixed(1)
+      data.avgDeathsPerGame = (data.totalDeaths / data.nGames).toFixed(1)
+      data.avgAssistsPerGame = (data.totalAssists / data.nGames).toFixed(1)
+      data.avgKDA = Math.round((Number(data.totalKills) + Number(data.totalAssists)) / Number(data.totalDeaths) * 10) / 10
+      data.winrate = Math.round((data.totalWins / (data.totalWins + data.totalLosses)) * 100)
+    })
+
+    let profileTotalKills = 0;
+    let profileTotalAssists = 0;
+    let profileTotalDeaths = 0;
+
+    Object.values(profileChampionData).forEach(champion => {
+      profileTotalKills += champion.totalKills
+      profileTotalAssists += champion.totalAssists
+      profileTotalDeaths += champion.totalDeaths
+    })
+
+    profileData.avgKDA = Math.round(((profileTotalKills + profileTotalAssists) / profileTotalDeaths) * 10) / 10
+    profileData.avgKillsPerGame = Math.round((profileTotalKills / profileData.matches.length) * 10) / 10;
+    profileData.avgDeathsPerGame = Math.round((profileTotalDeaths / profileData.matches.length) * 10) / 10;
+    profileData.avgAssistsPerGame = Math.round((profileTotalAssists / profileData.matches.length) * 10) / 10;
+
+    profileData.profileChampionData = profileChampionData
 
     return res.json(profileData);
   } catch (error) {
